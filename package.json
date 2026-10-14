@@ -8,9 +8,10 @@
     "start": "next start",
     "lint": "next lint",
     "db:push": "prisma db push",
-    "db:seed": "node --import tsx/esm prisma/seed.ts",
-    "db:clear": "node --import tsx/esm prisma/clear.ts",
-    "prisma:generate": "prisma generate"
+    "db:seed": "tsx prisma/seed.ts",
+    "db:clear": "tsx prisma/clear.ts",
+    "prisma:generate": "prisma generate",
+    "test": "tsx tests/run-tests.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
@@ -22,7 +23,8 @@
     "next": "^15.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "tailwind-merge": "^2.5.5"
+    "tailwind-merge": "^2.5.5",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

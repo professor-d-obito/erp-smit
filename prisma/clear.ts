@@ -6,10 +6,26 @@ async function main() {
   console.log('🧹 Clearing all data from SMIT ERP database...');
 
   // Deleting records in foreign-key safe order
+  const marks = await prisma.markEntry.deleteMany();
+  const questions = await prisma.questionMapping.deleteMany();
+  const assessments = await prisma.assessment.deleteMany();
+  const roster = await prisma.courseRoster.deleteMany();
+  const sessionRecords = await prisma.attendanceSessionRecord.deleteMany();
+  const sessions = await prisma.attendanceSession.deleteMany();
+  const assignments = await prisma.facultyCourseAssignment.deleteMany();
+  const coPo = await prisma.cO_PO_Mapping.deleteMany();
+  const cos = await prisma.courseOutcome.deleteMany();
+  const pos = await prisma.programOutcome.deleteMany();
+
+  const announcements = await prisma.announcement.deleteMany();
+  const documents = await prisma.documentUpload.deleteMany();
+  const attendance = await prisma.attendanceRecord.deleteMany();
+  const students = await prisma.student.deleteMany();
   const auditLogs = await prisma.auditLog.deleteMany();
   const appSettings = await prisma.appSetting.deleteMany();
   const rolePermissions = await prisma.rolePermission.deleteMany();
   const permissions = await prisma.permission.deleteMany();
+
   const subjects = await prisma.subject.deleteMany();
   const courses = await prisma.course.deleteMany();
   const staffProfiles = await prisma.staffProfile.deleteMany();
@@ -22,19 +38,16 @@ async function main() {
   const users = await prisma.user.deleteMany();
   const roles = await prisma.role.deleteMany();
 
-  console.log('✅ Database completely wiped for project submission!');
-  console.log(`   - Deleted ${auditLogs.count} Audit Logs`);
-  console.log(`   - Deleted ${appSettings.count} App Settings`);
-  console.log(`   - Deleted ${rolePermissions.count} Role Permissions`);
-  console.log(`   - Deleted ${permissions.count} Permissions`);
-  console.log(`   - Deleted ${subjects.count} Subjects`);
-  console.log(`   - Deleted ${courses.count} Courses`);
+  console.log('✅ Database completely wiped!');
+  console.log(`   - Deleted ${students.count} Students`);
   console.log(`   - Deleted ${staffProfiles.count} Staff Profiles`);
-  console.log(`   - Deleted ${departments.count} Departments`);
-  console.log(`   - Deleted ${designations.count} Designations`);
   console.log(`   - Deleted ${users.count} Users`);
-  console.log(`   - Deleted ${roles.count} Roles`);
-  console.log('🎉 Database is now 100% empty.');
+  console.log(`   - Deleted ${documents.count} Documents`);
+  console.log(`   - Deleted ${announcements.count} Announcements`);
+  console.log(`   - Deleted ${marks.count} Mark Entries`);
+  console.log(`   - Deleted ${assessments.count} Assessments`);
+  console.log(`   - Deleted ${auditLogs.count} Audit Logs`);
+  console.log('🎉 Database is now 100% reset and clean.');
 }
 
 main()

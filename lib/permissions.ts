@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/db';
+import { prisma } from './db';
 
 export const PERMISSION_CODES = {
   STAFF_VIEW: 'staff:view',
@@ -27,6 +27,9 @@ export const PERMISSION_CODES = {
   ROLES_MANAGE: 'roles:manage',
   ANNOUNCEMENTS_VIEW: 'announcements:view',
   ANNOUNCEMENTS_MANAGE: 'announcements:manage',
+
+  OBE_VIEW: 'obe:view',
+  OBE_MANAGE: 'obe:manage',
 } as const;
 
 export type PermissionCode = keyof typeof PERMISSION_CODES | string;

@@ -48,6 +48,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ user, isOpen, onClose }) => {
       show: true,
     },
     {
+      label: 'Faculty OBE Portal',
+      href: '/obe',
+      icon: Award,
+      description: 'CO-PO Attainment & Assessments',
+      badge: 'AU 2021',
+      show: true,
+    },
+    {
       label: 'Staff Directory',
       href: '/staff',
       icon: Users,

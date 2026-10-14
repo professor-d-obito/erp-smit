@@ -24,18 +24,26 @@ Built with Next.js (App Router), TypeScript, Prisma ORM, Tailwind CSS, and secur
 - **Admin Audit Trail**: Immutable tracking of user CRUD, account status changes, password resets, academic structure updates, and settings changes.
 - **Central Branding & Theme**: Customize college name, primary/secondary colors, contact email/phone, address, and academic year from `lib/theme-config.ts` or the Admin Settings UI.
 
+### 3. Anna University Outcome-Based Education (OBE) & Faculty Assessment
+- **Curriculum Modes**: Supports Theory (40M CA / 60M End-Sem), Laboratory (60M CA / 40M Model), Lab Integrated Theory (50M Theory / 50M Practical), and Project Work (40M Continuous).
+- **Course Outcomes & Correlation Matrix**: Define CO1–CO6 mapped to Bloom's taxonomy (K1–K6) and correlated against 14 Washington Accord Program Outcomes (PO1–PO12, PSO1, PSO2) with Levels 0 to 3.
+- **Question Paper to CO Disaggregation**: Pre-configure assessments (IAT 1, IAT 2/Model, Assignments) with question numbers (Part A, Part B, Part C), max marks, and mapped COs.
+- **Interactive Matrix & Bulk Excel Sync**: Live grid-based mark entry matrix with client-side range validation, absent/malpractice badges, and bidirectional Excel `.xlsx` template export and bulk ingestion.
+- **Automated Calculation Engine**: Direct CO attainment percentage (Levels 0–3 based on 50% threshold), PO weighted matrix projection, and official Anna University internal marks scaling.
+- **Decoupled Attendance & Detention Engine**: Period-wise (Hours 1 to 8) tracking independent of academic marks with automated Anna University eligibility compliance categorization (Eligible ≥75%, Condonation 65%–74.9%, Detained <65%).
+
 ---
 
-## 🔑 Safe Demo Super Admin Credentials
+## 🔑 Root Administrator Onboarding Credentials
 
-The database comes pre-seeded with sample SMIT college data and accounts:
+The database is initialized in a **clean, commercial production-ready state** with zero mock students and zero mock staff:
 
-| Role | Email | Employee ID | Default Password | Notes |
+| Role | Email | Employee ID | Default Password | Access Level |
 | :--- | :--- | :--- | :--- | :--- |
-| **Super Admin** | `admin@smit.edu.in` | `EMP-ADMIN-001` | `Admin@123456` | Prompts for mandatory password change on first login |
-| **HOD (CSE Dept)** | `hod.cse@smit.edu.in` | `EMP-CSE-001` | `Staff@123456` | Access restricted to CSE department data |
-| **HOD (ECE Dept)** | `hod.ece@smit.edu.in` | `EMP-ECE-001` | `Staff@123456` | Access restricted to ECE department data |
-| **Faculty Staff** | `suresh.n@smit.edu.in` | `EMP-CSE-002` | `Staff@123456` | Assistant Professor, CSE |
+| **System Administrator** | `admin@smit.edu.in` | `EMP-ADMIN-001` | `Admin@123456` | Root overarching administrator access |
+
+> [!NOTE]
+> **First Login Security**: Upon initial login with `Admin@123456`, the administrator is prompted to set their own secure institutional password. The administrator can then create and appoint real Department Heads (HODs), onboard faculty staff, enroll student rosters, and assign course subjects via the ERP interface.
 
 ---
 

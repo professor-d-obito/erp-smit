@@ -28,6 +28,7 @@ model User {
   markedAttendance   AttendanceRecord[] @relation("AttendanceMarkedBy")
   uploadedDocuments  DocumentUpload[]   @relation("DocumentUploadedBy")
   announcements      Announcement[]     @relation("AnnouncementAuthor")
+  facultyAssignments FacultyCourseAssignment[] @relation("FacultyAssignments")
 }
 
 model Role {
@@ -130,11 +131,14 @@ model Subject {
   semester     Int        @default(1)
   credits      Int        @default(3)
   subjectType  String     @default("THEORY") // THEORY, PRACTICAL, ELECTIVE, LABORATORY
+  courseType   String     @default("THEORY") // THEORY, LABORATORY, LAB_INTEGRATED_THEORY, PROJECT_VIVA_VOCE
   status       String     @default("ACTIVE") // ACTIVE, ARCHIVED
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
-  attendance   AttendanceRecord[]
+  attendance     AttendanceRecord[]
+  assignments    FacultyCourseAssignment[] @relation("SubjectAssignments")
+  courseOutcomes CourseOutcome[]           @relation("SubjectOutcomes")
 }
 
 model Designation {
@@ -166,8 +170,10 @@ model Student {
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
 
-  attendance   AttendanceRecord[]
-  documents    DocumentUpload[]
+  attendance                AttendanceRecord[]
+  documents                 DocumentUpload[]
+  courseRosters             CourseRoster[]
+  sessionAttendanceRecords  AttendanceSessionRecord[]
 }
 
 model AttendanceRecord {
@@ -239,4 +245,160 @@ model Announcement {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
+
+// ==========================================
+// ANNA UNIVERSITY OBE & FACULTY ASSESSMENT
+// ==========================================
+
+model FacultyCourseAssignment {
+  id           String        @id @default(uuid())
+  facultyId    String
+  faculty      User          @relation("FacultyAssignments", fields: [facultyId], references: [id], onDelete: Cascade)
+  subjectId    String
+  subject      Subject       @relation("SubjectAssignments", fields: [subjectId], references: [id], onDelete: Cascade)
+  academicYear String        // e.g. "2024-2025"
+  semester     Int           // 1 to 8
+  section      String        @default("A")
+  courseType   String        @default("THEORY") // THEORY, LABORATORY, LAB_INTEGRATED_THEORY, PROJECT_VIVA_VOCE
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  roster              CourseRoster[]
+  assessments         Assessment[]
+  attendanceSessions  AttendanceSession[]
+
+  @@unique([facultyId, subjectId, academicYear, semester, section])
+}
+
+model CourseRoster {
+  id           String                  @id @default(uuid())
+  assignmentId String
+  assignment   FacultyCourseAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  studentId    String
+  student      Student                 @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  isElective   Boolean                 @default(false)
+  createdAt    DateTime                @default(now())
+
+  markEntries  MarkEntry[]
+
+  @@unique([assignmentId, studentId])
+}
+
+model CourseOutcome {
+  id                     String           @id @default(uuid())
+  subjectId              String
+  subject                Subject          @relation("SubjectOutcomes", fields: [subjectId], references: [id], onDelete: Cascade)
+  code                   String           // "CO1", "CO2", "CO3", "CO4", "CO5", "CO6"
+  description            String
+  bloomsLevel            String           @default("K2_UNDERSTAND") // K1_REMEMBER, K2_UNDERSTAND, K3_APPLY, K4_ANALYZE, K5_EVALUATE, K6_CREATE
+  targetThresholdPercent Float            @default(50.0) // Pass threshold % per question (e.g. 50%)
+  targetAttainmentLevel3 Float            @default(70.0) // >= 70% students score >= threshold -> Level 3
+  targetAttainmentLevel2 Float            @default(60.0) // >= 60% students -> Level 2
+  targetAttainmentLevel1 Float            @default(50.0) // >= 50% students -> Level 1
+  createdAt              DateTime         @default(now())
+  updatedAt              DateTime         @updatedAt
+
+  poMappings             CO_PO_Mapping[]
+  questions              QuestionMapping[]
+
+  @@unique([subjectId, code])
+}
+
+model ProgramOutcome {
+  id          String          @id @default(uuid())
+  code        String          @unique // "PO1".."PO12", "PSO1", "PSO2"
+  title       String
+  description String
+  category    String          @default("PO") // PO or PSO
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  coMappings  CO_PO_Mapping[]
+}
+
+model CO_PO_Mapping {
+  id               String          @id @default(uuid())
+  coId             String
+  co               CourseOutcome   @relation(fields: [coId], references: [id], onDelete: Cascade)
+  poId             String
+  po               ProgramOutcome  @relation(fields: [poId], references: [id], onDelete: Cascade)
+  correlationLevel Int             @default(0) // 0: None, 1: Low, 2: Medium, 3: High
+
+  @@unique([coId, poId])
+}
+
+model Assessment {
+  id            String                  @id @default(uuid())
+  assignmentId  String
+  assignment    FacultyCourseAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  title         String                  // e.g. "Internal Assessment Test - I"
+  category      String                  @default("IAT_1") // IAT_1, IAT_2, ASSIGNMENT, LAB_CONTINUOUS, LAB_MODEL_EXAM, PROJECT_REVIEW
+  maxTotalMarks Float                   @default(50.0)
+  weightage     Float                   @default(20.0)
+  conductedDate DateTime?
+  isLocked      Boolean                 @default(false)
+  createdAt     DateTime                @default(now())
+  updatedAt     DateTime                @updatedAt
+
+  questions     QuestionMapping[]
+}
+
+model QuestionMapping {
+  id             String          @id @default(uuid())
+  assessmentId   String
+  assessment     Assessment      @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  questionNumber String          // "Q1", "Q2", "Q11a", "Q11b"
+  partSection    String          @default("PART_A") // PART_A, PART_B, PART_C
+  maxMarks       Float
+  coId           String
+  co             CourseOutcome   @relation(fields: [coId], references: [id], onDelete: Cascade)
+  bloomsLevel    String          @default("K2_UNDERSTAND")
+
+  marks          MarkEntry[]
+
+  @@unique([assessmentId, questionNumber])
+}
+
+model MarkEntry {
+  id            String          @id @default(uuid())
+  questionId    String
+  question      QuestionMapping @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  rosterId      String
+  roster        CourseRoster    @relation(fields: [rosterId], references: [id], onDelete: Cascade)
+  marksObtained Float?          // null if absent or malpractice
+  isAbsent      Boolean         @default(false)
+  isMalpractice Boolean         @default(false)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@unique([questionId, rosterId])
+}
+
+model AttendanceSession {
+  id            String                  @id @default(uuid())
+  assignmentId  String
+  assignment    FacultyCourseAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  date          DateTime
+  hour          Int                     // Hour 1 through 8
+  sessionTopic  String?
+  conductedById String
+  createdAt     DateTime                @default(now())
+
+  records       AttendanceSessionRecord[]
+
+  @@unique([assignmentId, date, hour])
+}
+
+model AttendanceSessionRecord {
+  id        String            @id @default(uuid())
+  sessionId String
+  session   AttendanceSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  studentId String
+  student   Student           @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  status    String            @default("PRESENT") // PRESENT, ABSENT, ON_DUTY, MEDICAL_LEAVE
+  remarks   String?
+
+  @@unique([sessionId, studentId])
+}
+
 
