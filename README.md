@@ -84,10 +84,10 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 🧪 Automated Verification Testing
 
-To execute automated tests verifying authentication, password hashing, rate limiting, role permissions, and academic relational integrity:
+To execute all automated tests verifying authentication, password hashing, rate limiting, role permissions, branch isolation, announcements, and the Anna University OBE calculation engine:
 
 ```bash
-npx tsx tests/run-tests.ts
+npm test
 ```
 
 ---

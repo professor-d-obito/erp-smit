@@ -11,7 +11,7 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:clear": "tsx prisma/clear.ts",
     "prisma:generate": "prisma generate",
-    "test": "tsx tests/run-tests.ts"
+    "test": "tsx tests/run-tests.ts && tsx tests/verify-permissions.ts && tsx tests/verify-announcements.ts && tsx tests/verify-obe.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
