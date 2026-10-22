@@ -113,6 +113,27 @@ export async function POST(req: NextRequest) {
     });
   } catch (err: any) {
     console.error('Login API error:', err);
+
+    // Diagnostic check for unconfigured or uninitialized database (e.g. serverless host without DATABASE_URL)
+    const isDbError =
+      err?.code?.startsWith?.('P') ||
+      err?.name === 'PrismaClientInitializationError' ||
+      err?.name === 'PrismaClientKnownRequestError' ||
+      err?.message?.includes?.('DATABASE_URL') ||
+      err?.message?.includes?.('database') ||
+      err?.message?.includes?.('does not exist');
+
+    if (isDbError) {
+      return NextResponse.json(
+        {
+          error:
+            'Database error: The database is unreachable or uninitialized. If hosting on Netlify/Vercel, please configure DATABASE_URL in your hosting environment variables.',
+          details: process.env.NODE_ENV !== 'production' ? err?.message : undefined,
+        },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json(
       { error: 'An unexpected authentication error occurred. Please try again.' },
       { status: 500 }

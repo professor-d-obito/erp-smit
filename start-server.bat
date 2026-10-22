@@ -16,5 +16,5 @@ echo    - Password:     Admin@123456
 echo.
 echo ======================================================================
 echo.
-npx next dev -H 0.0.0.0 -p 3000
+call npx next dev -H 0.0.0.0 -p 3000
 pause
