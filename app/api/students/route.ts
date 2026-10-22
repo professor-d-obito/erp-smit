@@ -16,8 +16,9 @@ export async function GET(req: NextRequest) {
     const departmentId = searchParams.get('departmentId');
     const courseId = searchParams.get('courseId');
     const semester = searchParams.get('semester');
+    const section = searchParams.get('section');
     const page = parseInt(searchParams.get('page') || '1', 10);
-    const limit = parseInt(searchParams.get('limit') || '10', 10);
+    const limit = parseInt(searchParams.get('limit') || '50', 10);
 
     const skip = (page - 1) * limit;
 
@@ -32,6 +33,7 @@ export async function GET(req: NextRequest) {
       ...(effectiveDeptId ? { departmentId: effectiveDeptId } : {}),
       ...(courseId ? { courseId } : {}),
       ...(semester ? { semester: parseInt(semester, 10) } : {}),
+      ...(section ? { section } : {}),
       ...(search
         ? {
             OR: [

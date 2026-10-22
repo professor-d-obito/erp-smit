@@ -23,6 +23,8 @@ import {
   AlertTriangle,
   ChevronRight,
   Sparkles,
+  CreditCard,
+  BookOpenCheck,
 } from 'lucide-react';
 
 export default async function DashboardPage() {
@@ -234,10 +236,22 @@ export default async function DashboardPage() {
             <span className="text-sm font-bold text-[#701111]">Principal Quick Control Panel</span>
             <span className="text-xs text-slate-500">Shortcuts to main modules</span>
           </CardHeader>
-          <CardBody className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <CardBody className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
             <Link href="/announcements" className="flex flex-col items-center justify-center p-3.5 rounded-xl border border-amber-200 bg-amber-50/50 hover:bg-[#701111] hover:text-white transition-all text-center group">
               <Megaphone className="h-5 w-5 text-amber-600 group-hover:text-amber-400 mb-1.5" />
               <span className="text-xs font-bold">Announcements</span>
+            </Link>
+            <Link href="/attendance" className="flex flex-col items-center justify-center p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/50 hover:bg-[#701111] hover:text-white transition-all text-center group">
+              <UserCheck className="h-5 w-5 text-emerald-600 group-hover:text-emerald-400 mb-1.5" />
+              <span className="text-xs font-bold">Fast Attendance</span>
+            </Link>
+            <Link href="/exams" className="flex flex-col items-center justify-center p-3.5 rounded-xl border border-sky-200 bg-sky-50/50 hover:bg-[#701111] hover:text-white transition-all text-center group">
+              <BookOpenCheck className="h-5 w-5 text-sky-600 group-hover:text-sky-400 mb-1.5" />
+              <span className="text-xs font-bold">Exam Results</span>
+            </Link>
+            <Link href="/fees" className="flex flex-col items-center justify-center p-3.5 rounded-xl border border-purple-200 bg-purple-50/50 hover:bg-[#701111] hover:text-white transition-all text-center group">
+              <CreditCard className="h-5 w-5 text-purple-600 group-hover:text-purple-400 mb-1.5" />
+              <span className="text-xs font-bold">Fee Payments</span>
             </Link>
             <Link href="/staff" className="flex flex-col items-center justify-center p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-[#701111] hover:text-white transition-all text-center group">
               <UserPlus className="h-5 w-5 text-[#701111] group-hover:text-amber-400 mb-1.5" />
@@ -246,10 +260,6 @@ export default async function DashboardPage() {
             <Link href="/students" className="flex flex-col items-center justify-center p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-[#701111] hover:text-white transition-all text-center group">
               <GraduationCap className="h-5 w-5 text-[#701111] group-hover:text-amber-400 mb-1.5" />
               <span className="text-xs font-bold">Student Roster</span>
-            </Link>
-            <Link href="/attendance" className="flex flex-col items-center justify-center p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-[#701111] hover:text-white transition-all text-center group">
-              <UserCheck className="h-5 w-5 text-[#701111] group-hover:text-amber-400 mb-1.5" />
-              <span className="text-xs font-bold">Attendance Log</span>
             </Link>
             <Link href="/documents" className="flex flex-col items-center justify-center p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-[#701111] hover:text-white transition-all text-center group">
               <FolderOpen className="h-5 w-5 text-[#701111] group-hover:text-amber-400 mb-1.5" />
@@ -488,20 +498,33 @@ export default async function DashboardPage() {
         </div>
 
         <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Link href="/documents" className="p-5 rounded-2xl bg-white border border-slate-200 shadow-lg hover:shadow-xl hover:border-[#701111] transition-all flex flex-col items-start space-y-2">
-            <Upload className="h-8 w-8 text-[#701111]" />
+          <Link href="/attendance" className="p-5 rounded-2xl bg-white border border-emerald-200 shadow-lg hover:shadow-xl hover:border-emerald-600 transition-all flex flex-col items-start space-y-2 group">
+            <div className="p-2.5 rounded-xl bg-emerald-100 text-emerald-800 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+              <UserCheck className="h-6 w-6" />
+            </div>
+            <h3 className="text-sm font-extrabold text-slate-900">Fast Class Attendance</h3>
+            <p className="text-xs text-slate-500">Effortless 1-click batch attendance entry and absentee tracking for your classes.</p>
+          </Link>
+          <Link href="/exams" className="p-5 rounded-2xl bg-white border border-sky-200 shadow-lg hover:shadow-xl hover:border-sky-600 transition-all flex flex-col items-start space-y-2 group">
+            <div className="p-2.5 rounded-xl bg-sky-100 text-sky-800 group-hover:bg-sky-600 group-hover:text-white transition-colors">
+              <BookOpenCheck className="h-6 w-6" />
+            </div>
+            <h3 className="text-sm font-extrabold text-slate-900">Exam Results & Marks Entry</h3>
+            <p className="text-xs text-slate-500">Fast evaluation spreadsheet, auto letter grade formatting, and student grade cards.</p>
+          </Link>
+          <Link href="/fees" className="p-5 rounded-2xl bg-white border border-purple-200 shadow-lg hover:shadow-xl hover:border-purple-600 transition-all flex flex-col items-start space-y-2 group">
+            <div className="p-2.5 rounded-xl bg-purple-100 text-purple-800 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+              <CreditCard className="h-6 w-6" />
+            </div>
+            <h3 className="text-sm font-extrabold text-slate-900">Student Fee Management</h3>
+            <p className="text-xs text-slate-500">Review student fee payment statuses, dues, and official digital receipts.</p>
+          </Link>
+          <Link href="/documents" className="p-5 rounded-2xl bg-white border border-slate-200 shadow-lg hover:shadow-xl hover:border-[#701111] transition-all flex flex-col items-start space-y-2 group">
+            <div className="p-2.5 rounded-xl bg-rose-100 text-[#701111] group-hover:bg-[#701111] group-hover:text-white transition-colors">
+              <Upload className="h-6 w-6" />
+            </div>
             <h3 className="text-sm font-extrabold text-slate-900">Upload Student Reports</h3>
-            <p className="text-xs text-slate-500">Upload Word (.docx), PDF marksheets, and Excel spreadsheets for HOD review.</p>
-          </Link>
-          <Link href="/attendance" className="p-5 rounded-2xl bg-white border border-slate-200 shadow-lg hover:shadow-xl hover:border-[#701111] transition-all flex flex-col items-start space-y-2">
-            <UserCheck className="h-8 w-8 text-[#701111]" />
-            <h3 className="text-sm font-extrabold text-slate-900">Mark Attendance</h3>
-            <p className="text-xs text-slate-500">Record present/absent statuses for students in your assigned department.</p>
-          </Link>
-          <Link href="/students" className="p-5 rounded-2xl bg-white border border-slate-200 shadow-lg hover:shadow-xl hover:border-[#701111] transition-all flex flex-col items-start space-y-2 sm:col-span-2">
-            <GraduationCap className="h-8 w-8 text-[#701111]" />
-            <h3 className="text-sm font-extrabold text-slate-900">Department Students Roster</h3>
-            <p className="text-xs text-slate-500">View enrolled student roster and details in your department.</p>
+            <p className="text-xs text-slate-500">Upload Word (.docx), PDF marksheets, and Excel files for department records.</p>
           </Link>
         </div>
       </div>

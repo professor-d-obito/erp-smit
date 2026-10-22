@@ -30,6 +30,14 @@ export const PERMISSION_CODES = {
 
   OBE_VIEW: 'obe:view',
   OBE_MANAGE: 'obe:manage',
+
+  FEES_VIEW: 'fees:view',
+  FEES_MANAGE: 'fees:manage',
+  FEES_COLLECT: 'fees:collect',
+
+  EXAMS_VIEW: 'exams:view',
+  EXAMS_MANAGE: 'exams:manage',
+  EXAMS_ENTER_MARKS: 'exams:enter_marks',
 } as const;
 
 export type PermissionCode = keyof typeof PERMISSION_CODES | string;

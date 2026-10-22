@@ -29,6 +29,8 @@ model User {
   uploadedDocuments  DocumentUpload[]   @relation("DocumentUploadedBy")
   announcements      Announcement[]     @relation("AnnouncementAuthor")
   facultyAssignments FacultyCourseAssignment[] @relation("FacultyAssignments")
+  collectedFeePayments FeePayment[]       @relation("FeeCollectedBy")
+  enteredExamResults   ExamResult[]       @relation("ExamEnteredBy")
 }
 
 model Role {
@@ -101,6 +103,7 @@ model Department {
   students    Student[]
   attendance  AttendanceRecord[]
   documents   DocumentUpload[]
+  feeStructures FeeStructure[]
 }
 
 model Course {
@@ -118,6 +121,7 @@ model Course {
 
   subjects       Subject[]
   students       Student[]
+  feeStructures  FeeStructure[]
 }
 
 model Subject {
@@ -139,6 +143,7 @@ model Subject {
   attendance     AttendanceRecord[]
   assignments    FacultyCourseAssignment[] @relation("SubjectAssignments")
   courseOutcomes CourseOutcome[]           @relation("SubjectOutcomes")
+  examResults    ExamResult[]
 }
 
 model Designation {
@@ -174,6 +179,8 @@ model Student {
   documents                 DocumentUpload[]
   courseRosters             CourseRoster[]
   sessionAttendanceRecords  AttendanceSessionRecord[]
+  feeRecords                StudentFee[]
+  examResults               ExamResult[]
 }
 
 model AttendanceRecord {
@@ -187,7 +194,8 @@ model AttendanceRecord {
   markedByUserId String
   markedByUser   User       @relation("AttendanceMarkedBy", fields: [markedByUserId], references: [id], onDelete: Cascade)
   date           DateTime   @default(now())
-  status         String     // PRESENT, ABSENT, LATE
+  hour           Int?       @default(1)
+  status         String     // PRESENT, ABSENT, LATE, ON_DUTY
   remarks        String?
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
@@ -400,5 +408,110 @@ model AttendanceSessionRecord {
 
   @@unique([sessionId, studentId])
 }
+
+// ==========================================
+// FEE MANAGEMENT & PAYMENT TRANSACTIONS
+// ==========================================
+
+model FeeStructure {
+  id           String      @id @default(uuid())
+  title        String      // e.g. "BE-CSE Year 3 Tuition Fee"
+  academicYear String      // e.g. "2026-2027"
+  courseId     String?
+  course       Course?     @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  semester     Int?
+  category     String      @default("TUITION") // TUITION, EXAM, HOSTEL, TRANSPORT, LAB, MISC
+  amount       Float
+  dueDate      DateTime?
+  description  String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  studentFees  StudentFee[]
+}
+
+model StudentFee {
+  id             String        @id @default(uuid())
+  studentId      String
+  student        Student       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  feeStructureId String?
+  feeStructure   FeeStructure? @relation(fields: [feeStructureId], references: [id], onDelete: SetNull)
+  title          String        // e.g. "Semester 5 Tuition Fee"
+  category       String        @default("TUITION") // TUITION, EXAM, HOSTEL, TRANSPORT, LAB, MISC
+  academicYear   String        // e.g. "2026-2027"
+  totalAmount    Float
+  discountAmount Float         @default(0.0)
+  paidAmount     Float         @default(0.0)
+  balance        Float         // totalAmount - discountAmount - paidAmount
+  dueDate        DateTime?
+  status         String        @default("PENDING") // PENDING, PARTIAL, PAID, OVERDUE
+  remarks        String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  payments       FeePayment[]
+}
+
+model FeePayment {
+  id                String     @id @default(uuid())
+  studentFeeId      String
+  studentFee        StudentFee @relation(fields: [studentFeeId], references: [id], onDelete: Cascade)
+  receiptNumber     String     @unique // e.g. "REC-2026-0001"
+  amount            Float
+  paymentMode       String     @default("CASH") // CASH, UPI_ONLINE, NET_BANKING, DD_CHEQUE, CARD
+  transactionRef    String?    // UPI Reference / UTR / Cheque Number
+  paidDate          DateTime   @default(now())
+  collectedByUserId String?
+  collectedByUser   User?      @relation("FeeCollectedBy", fields: [collectedByUserId], references: [id], onDelete: SetNull)
+  remarks           String?
+  createdAt         DateTime   @default(now())
+}
+
+// ==========================================
+// EXAM SESSIONS & SEMESTER RESULTS
+// ==========================================
+
+model Exam {
+  id           String       @id @default(uuid())
+  title        String       // e.g. "Nov/Dec 2026 End Semester Examinations"
+  examType     String       @default("SEMESTER") // SEMESTER, INTERNAL_IAT1, INTERNAL_IAT2, MODEL_EXAM, PRACTICAL
+  academicYear String       // e.g. "2026-2027"
+  semester     Int          @default(1)
+  startDate    DateTime?
+  endDate      DateTime?
+  isPublished  Boolean      @default(false)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  results      ExamResult[]
+}
+
+model ExamResult {
+  id              String    @id @default(uuid())
+  examId          String
+  exam            Exam      @relation(fields: [examId], references: [id], onDelete: Cascade)
+  studentId       String
+  student         Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subjectId       String
+  subject         Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  internalMarks   Float?    // e.g. out of 40
+  externalMarks   Float?    // e.g. out of 60
+  totalMarks      Float     // 0 - 100
+  maxMarks        Float     @default(100.0)
+  grade           String    // O, A+, A, B+, B, C, RA, AB
+  gradePoint      Float     // 10, 9, 8, 7, 6, 5, 0
+  credits         Int       @default(3)
+  resultStatus    String    @default("PASS") // PASS, RA, AB, WH
+  remarks         String?
+  enteredByUserId String?
+  enteredByUser   User?     @relation("ExamEnteredBy", fields: [enteredByUserId], references: [id], onDelete: SetNull)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([examId, studentId, subjectId])
+}
+
 
 

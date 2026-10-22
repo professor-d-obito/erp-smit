@@ -15,8 +15,9 @@ export async function GET(req: NextRequest) {
     const departmentId = searchParams.get('departmentId');
     const subjectId = searchParams.get('subjectId');
     const dateStr = searchParams.get('date');
+    const hourStr = searchParams.get('hour');
     const page = parseInt(searchParams.get('page') || '1', 10);
-    const limit = parseInt(searchParams.get('limit') || '20', 10);
+    const limit = parseInt(searchParams.get('limit') || '50', 10);
 
     const skip = (page - 1) * limit;
 
@@ -26,10 +27,26 @@ export async function GET(req: NextRequest) {
       effectiveDeptId = user.departmentId;
     }
 
+    let dateFilter: any = {};
+    if (dateStr) {
+      const parsed = new Date(dateStr);
+      const startOfDay = new Date(parsed);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(parsed);
+      endOfDay.setHours(23, 59, 59, 999);
+      dateFilter = {
+        date: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+      };
+    }
+
     const whereCondition: any = {
       ...(effectiveDeptId ? { departmentId: effectiveDeptId } : {}),
       ...(subjectId ? { subjectId } : {}),
-      ...(dateStr ? { date: new Date(dateStr) } : {}),
+      ...(hourStr ? { hour: parseInt(hourStr, 10) } : {}),
+      ...dateFilter,
     };
 
     const [records, totalCount] = await Promise.all([
@@ -71,7 +88,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { studentId, subjectId, status, date, remarks } = body;
+    const { studentId, subjectId, status, date, remarks, hour = 1 } = body;
 
     if (!studentId || !status) {
       return NextResponse.json({ error: 'Student ID and Attendance Status are required.' }, { status: 400 });
@@ -101,7 +118,8 @@ export async function POST(req: NextRequest) {
         departmentId: student.departmentId,
         markedByUserId: currentUser.id,
         date: date ? new Date(date) : new Date(),
-        status, // PRESENT, ABSENT, LATE
+        hour: Number(hour) || 1,
+        status, // PRESENT, ABSENT, LATE, ON_DUTY
         remarks: remarks || null,
       },
       include: {

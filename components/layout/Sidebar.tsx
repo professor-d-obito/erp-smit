@@ -18,6 +18,8 @@ import {
   Megaphone,
   ChevronRight,
   ShieldCheck,
+  CreditCard,
+  BookOpenCheck,
 } from 'lucide-react';
 import { AuthenticatedUser, hasPermission, PERMISSION_CODES, isSuperAdmin, isHOD } from '@/lib/permissions';
 
@@ -74,6 +76,20 @@ export const Sidebar: React.FC<SidebarProps> = ({ user, isOpen, onClose }) => {
       href: '/attendance',
       icon: UserCheck,
       description: 'Daily Student Attendance',
+      show: true,
+    },
+    {
+      label: 'Exam Results',
+      href: '/exams',
+      icon: BookOpenCheck,
+      description: 'Marks Entry, Grade Cards & SGPA',
+      show: true,
+    },
+    {
+      label: 'Fee Management',
+      href: '/fees',
+      icon: CreditCard,
+      description: 'Student Fees & Payment Receipts',
       show: true,
     },
     {
