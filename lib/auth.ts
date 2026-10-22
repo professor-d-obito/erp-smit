@@ -4,7 +4,13 @@ import jwt from 'jsonwebtoken';
 import { prisma } from '@/lib/db';
 import { AuthenticatedUser, getRolePermissions } from '@/lib/permissions';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'smit-erp-super-secret-key-2026-production-ready';
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_SECRET must be configured in the server environment');
+  }
+  return secret;
+}
 const SESSION_COOKIE_NAME = 'smit_erp_session';
 
 export async function hashPassword(password: string): Promise<string> {
@@ -49,12 +55,12 @@ export function clearRateLimit(key: string) {
 }
 
 export function createSessionToken(payload: { userId: string }): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+  return jwt.sign(payload, getJwtSecret(), { expiresIn: '7d' });
 }
 
 export function verifySessionToken(token: string): { userId: string } | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as { userId: string };
+    return jwt.verify(token, getJwtSecret()) as { userId: string };
   } catch (e) {
     return null;
   }
