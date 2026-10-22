@@ -1,5 +1,5 @@
 [build]
-  command = "prisma generate && next build"
+  command = "node scripts/prepare-db.js && prisma generate && next build"
   publish = ".next"
 
 [build.environment]
